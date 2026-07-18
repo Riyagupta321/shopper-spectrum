@@ -21,11 +21,14 @@ page = st.sidebar.radio("Navigate", [
     "Business Insights"
 ])
 
-uploaded_file = st.sidebar.file_uploader("Upload your retail CSV file", type=['csv'])
+uploaded_file = st.sidebar.file_uploader("Upload your own retail CSV (optional)", type=['csv'])
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file, encoding='latin1')
+else:
+    df = pd.read_csv('online_retail.csv', encoding='latin1')
 
+if True:
     df = df.dropna(subset=['CustomerID'])
     df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
     df = df[~df['InvoiceNo'].astype(str).str.startswith('C')]
@@ -47,8 +50,11 @@ if uploaded_file is not None:
         st.dataframe(df.head(10))
 
         st.markdown("### Data Quality Check (Before Cleaning)")
-        uploaded_file.seek(0)
-        raw_df = pd.read_csv(uploaded_file, encoding='latin1')
+        if uploaded_file is not None:
+            uploaded_file.seek(0)
+            raw_df = pd.read_csv(uploaded_file, encoding='latin1')
+        else:
+            raw_df = pd.read_csv('online_retail.csv', encoding='latin1')
         st.write("Missing Values per Column:")
         st.dataframe(raw_df.isnull().sum().reset_index().rename(columns={0: 'Missing Count', 'index': 'Column'}))
 
